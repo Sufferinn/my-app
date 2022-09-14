@@ -121,7 +121,7 @@ function ContactsScreen({ navigation, route }) {
 
   return (
     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-      <Text style={{fontSize: 20}}> Demo Form </Text>
+      <Text style={{fontSize: 30}}> Demo Form </Text>
       <View>
         <TextInput placeholder="Email:"
         style={{borderWidth: 1}} />
@@ -152,75 +152,31 @@ function ContactsScreen({ navigation, route }) {
 }
 
 function AboutUsScreen({ navigation, route }) {
+
+  const workPeople = [
+    { name: 'Mark Zuckerberg', id: 1 },
+    { name: 'Jeff Bezos', id: 2 },
+    { name: 'Alexis Ohanian', id: 3 },
+    { name: 'Jack Ma', id: 4 },
+    { name: 'Jack Dorsey', id: 5 },
+    { name: 'Aaron Swartz', id: 6 },
+    { name: 'Jawed Karim ', id: 7 },
+    { name: 'Travis Kalanick', id: 8 },
+  ]
+
   const [modalVisible2, setModalVisible2] = useState(false);
     return (
         <View style={styles.centeredView}>
-          <Text style={{fontSize: 30, textAlign: 'center'}}>Our workers</Text>
-          <Modal
-          animationType="fade"
-          transparent={true}
-          visible={modalVisible2}
-          onRequestClose={() => {
-            setModalVisible(!modalVisible2);
-          }}>
-            <SafeAreaView style={styles.container2}>
-              <ScrollView style={styles.scrollView}>
-                <View style={styles.workers}>
-                  <Text style={styles.text}>
-                    Mark Zuckerberg 
-                  </Text>
+          <ScrollView>
+            { workPeople.map(workPeople => {
+              return (
+                <View id={workPeople.id}>
+                  <Text style={styles.item}>{workPeople.name}</Text>
                 </View>
-                <View style={styles.workers}>
-                  <Text style={styles.text}>
-                    Jeff Bezos
-                  </Text>
-                </View>
-                <View style={styles.workers}>
-                  <Text style={styles.text}>
-                    Alexis Ohanian 
-                  </Text>
-                </View>
-                <View style={styles.workers}>
-                  <Text style={styles.text}>
-                    Jack Ma
-                  </Text>
-                </View>
-                <View style={styles.workers}>
-                  <Text style={styles.text}>
-                    Jack Dorsey
-                  </Text>
-                </View>
-                <View style={styles.workers}>
-                  <Text style={styles.text}>
-                    Aaron Swartz
-                  </Text>
-                </View>
-                <View style={styles.workers}>
-                  <Text style={styles.text}>
-                    Jawed Karim 
-                  </Text>
-                </View>
-                <View style={styles.workers}>
-                  <Text style={styles.text}>
-                    Travis Kalanick
-                  </Text>
-                </View>
-              </ScrollView>
-            </SafeAreaView>
-              <Pressable
-                style={[styles.button, styles.buttonClose]}
-                onPress={() => setModalVisible2(!modalVisible2)}
-              >
-                <Text style={styles.textStyle}>X</Text>
-              </Pressable>
-        </Modal>
-        <Pressable
-          style={[styles.button, styles.buttonOpen]}
-          onPress={() => setModalVisible2(true)}
-        >
-          <Text style={styles.textStyle}>Show Modal</Text>
-        </Pressable>
-    </View>
+              )
+            })}
+          </ScrollView>
+        </View>
     )
 }
 
@@ -333,9 +289,11 @@ const styles = StyleSheet.create({
       shadowRadius: 3,
     },
     item: {
-      backgroundColor: "pink",
-      padding: 20,
-      marginVertical: 8
+      textAlign: 'center',
+      marginTop: 80,
+      padding: 25,
+      fontSize: 30,
+      backgroundColor: 'steelblue',
     },
     header: {
       fontSize: 40,
