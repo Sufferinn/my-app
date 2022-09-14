@@ -1,129 +1,228 @@
-import * as React from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, Text, Button, StyleSheet, Animated, SafeAreaView, FlatList, TouchableHighlight, TouchableOpacity, Switch, PanResponder, Modal, ScrollView, Pressable, StatusBar, TextInput, } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import Slider from '@react-native-community/slider';
+import CalculatorScreen from './screens/CalculatorScreen';
 
-function HomeScreen({ navigation }) {
+const DATA = [
+  {
+    id: '1',
+    title: '754-265-2936',
+  },
+  {
+    id: '2',
+    title: '281-341-1870',
+  },
+  {
+    id: '3',
+    title: '407-704-8669',
+  },
+  {
+    id: '4',
+    title: '260-209-0192',
+  },
+  {
+    id: '5',
+    title: '704-608-1666',
+  },
+  {
+    id: '6',
+    title: '712-949-3044',
+  },
+];
+
+const Item = ({ title }) => (
+  <View style={styles.item}>
+    <Text style={styles.title}>{title}</Text>
+  </View>
+);
+
+
+function HomeScreen({ navigation, route }) {
   return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#ADD8E6' }}>
-      <Text style={{fontWeight: 'bold', fontSize: 30, marginBottom: 10}}>Добро пожаловать в приложение "Мой Банк"!</Text>
-      <Text style={{fontWeight: 'bold', fontSize: 20, marginBottom: 30}}>Вам пригодятся ссылки внизу:</Text>
-      <Button
-        onPress={() => navigation.navigate('Current')}
-        title="Текущие счета">
-      </Button>
-      <Button
-        onPress={() => navigation.navigate('Support')}
-        title="Помощь">
-      </Button>
-      <Button
-        onPress={() => navigation.navigate('Info')}
-        title="Информация о кредите">
-      </Button>
-      <Button
-        onPress={() => navigation.navigate('Transfer')}
-        title="Переводы">
-      </Button>
+    <View style={{ flex: 1, alignItems: 'center', backgroundColor: '#BC8F8F' }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 10, marginLeft: 20, marginTop: 10 }}>
+            <Button title="Support" onPress={() => navigation.navigate('Support')}/>
+            <Button title="Contacts" onPress={() => navigation.navigate('Contacts')}/>
+            <Button title="About us" onPress={() => navigation.navigate('About us')}/>
+            <Button title="Loading" onPress={() => navigation.navigate('Loading')}/>
+            <Button title="Calculator" onPress={() => navigation.navigate('Calculator')}/>
+        </View>
+        <Text style={{fontSize: 50, fontFamily: 'American Typewriter, serif', marginTop: 20}}>Hi and Welcome to our New Website!</Text>
+        <Text style={{fontSize: 35, fontFamily: 'American Typewriter, serif', marginTop: 20}}>Here we post random things.</Text>
     </View>
   );
 }
 
-function CurrentScreen({ navigation }) {
+function CalcScreen({ navigation, route }) {
+    return <CalculatorScreen />
+}
+
+function LoadingScreen({ navigation, route }) {
+  const pan = useRef(new Animated.ValueXY()).current;
+  const panResponder = useRef(
+  PanResponder.create({
+    onMoveShouldSetPanResponder: () => true,
+    onPanResponderMove: Animated.event([
+      null,
+      { dx: pan.x, dy: pan.y }
+    ]),
+    onPanResponderRelease: () => {
+      Animated.spring(pan, { toValue: { x: 0, y: 0 } }).start();
+    }
+  })
+  ).current;
+
   return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-      <Text>Current Screen</Text>
-      <Button
-        title="Go to Support"
-        onPress={ () => navigation.navigate("Support")}
-      />
-      <Button
-        title="Go to Info"
-        onPress={ () => navigation.navigate("Info")}
-      />
-      <Button
-      title="Go to Transfer"
-      onPress={ () => navigation.navigate("Transfer")}
+    <View style={styles.container}>
+      <Text style={styles.titleText}>Drag this box!</Text>
+      <Animated.View
+        style={{
+          transform: [{ translateX: pan.x }, { translateY: pan.y }]
+        }}
+        {...panResponder.panHandlers}
+      >
+        <View style={styles.box} />
+      </Animated.View>
+    </View>
+  );
+}
+
+function SupportScreen({ navigation, route }) {
+  const renderItem = ({ item }) => (
+    <Item title={item.title} />
+  );
+
+  return (
+    <View
+    style={
+    {
+      justifyContent: 'center',
+      alignItems: 'center',
+      flex: 1,
+    }}>
+      <Text style={{fontWeight: 'bold', fontSize: 20, marginTop: 10}}>Phone one of these numbers to contact us</Text>
+      <SafeAreaView style={styles.container}>
+        <FlatList
+          data={DATA}
+          renderItem={renderItem}
+          keyExtractor={item => item.id}
         />
-      <Button title="Go to Home" onPress={() => navigation.navigate('Home')}/>
-      <Button 
-      title="Go Back to first screen in stack" 
-      onPress={() => navigation.popToTop()}/>
+      </SafeAreaView>
+      
+    </View>
+  );
+ 
+}   
+
+function ContactsScreen({ navigation, route }) {
+  const [value, setValue] = useState(0);
+
+  return (
+    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+      <Text style={{fontSize: 20}}> Demo Form </Text>
+      <View>
+        <TextInput placeholder="Email:"
+        style={{borderWidth: 1}} />
+        <TextInput
+          secureTextEntry={true}
+          placeholder="Password:"
+          style={{borderWidth: 1}}
+        />
+        <Text>
+          Rate your teams performance this quarter
+        </Text>
+        <Slider
+          step={1}
+          minimumValue={0}
+          maximumValue={100}
+          value={value}
+          onValueChange={slideValue => setValue(slideValue)}
+          minimumTrackTintColor="#1fb28a"
+          maximumTrackTintColor="#d3d3d3"
+          thumbTintColor="#b9e4c9"
+        />
+        <Text>
+          Slide value: {value}%
+        </Text>
+      </View>
     </View>
   )
 }
 
-function SupportScreen({ navigation }) {
+function AboutUsScreen({ navigation, route }) {
+  const [modalVisible2, setModalVisible2] = useState(false);
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-        <Text>Support Screen</Text>
-        <Button
-        title="Go to Current"
-        onPress={ () => navigation.navigate("Current")}
-      />
-      <Button
-        title="Go to Info"
-        onPress={ () => navigation.navigate("Info")}
-      />
-      <Button
-      title="Go to Transfer"
-      onPress={ () => navigation.navigate("Transfer")}
-        />
-      <Button title="Go to Home" onPress={() => navigation.navigate('Home')}/>
-      <Button 
-      title="Go Back to first screen in stack" 
-      onPress={() => navigation.popToTop()}/>
-      </View>
+        <View style={styles.centeredView}>
+          <Text style={{fontSize: 30, textAlign: 'center'}}>Our workers</Text>
+          <Modal
+          animationType="fade"
+          transparent={true}
+          visible={modalVisible2}
+          onRequestClose={() => {
+            setModalVisible(!modalVisible2);
+          }}>
+            <SafeAreaView style={styles.container2}>
+              <ScrollView style={styles.scrollView}>
+                <View style={styles.workers}>
+                  <Text style={styles.text}>
+                    Mark Zuckerberg 
+                  </Text>
+                </View>
+                <View style={styles.workers}>
+                  <Text style={styles.text}>
+                    Jeff Bezos
+                  </Text>
+                </View>
+                <View style={styles.workers}>
+                  <Text style={styles.text}>
+                    Alexis Ohanian 
+                  </Text>
+                </View>
+                <View style={styles.workers}>
+                  <Text style={styles.text}>
+                    Jack Ma
+                  </Text>
+                </View>
+                <View style={styles.workers}>
+                  <Text style={styles.text}>
+                    Jack Dorsey
+                  </Text>
+                </View>
+                <View style={styles.workers}>
+                  <Text style={styles.text}>
+                    Aaron Swartz
+                  </Text>
+                </View>
+                <View style={styles.workers}>
+                  <Text style={styles.text}>
+                    Jawed Karim 
+                  </Text>
+                </View>
+                <View style={styles.workers}>
+                  <Text style={styles.text}>
+                    Travis Kalanick
+                  </Text>
+                </View>
+              </ScrollView>
+            </SafeAreaView>
+              <Pressable
+                style={[styles.button, styles.buttonClose]}
+                onPress={() => setModalVisible2(!modalVisible2)}
+              >
+                <Text style={styles.textStyle}>X</Text>
+              </Pressable>
+        </Modal>
+        <Pressable
+          style={[styles.button, styles.buttonOpen]}
+          onPress={() => setModalVisible2(true)}
+        >
+          <Text style={styles.textStyle}>Show Modal</Text>
+        </Pressable>
+    </View>
     )
 }
-
-function InfoScreen({ navigation }) {
-    return (
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-          <Text>Info Screen</Text>
-          <Button
-            title="Go to Support"
-            onPress={ () => navigation.navigate("Support")}
-            />
-            <Button
-                title="Go to Current"
-                onPress={ () => navigation.navigate("Current")}
-            />
-            <Button
-            title="Go to Transfer"
-            onPress={ () => navigation.navigate("Transfer")}
-                />
-            <Button title="Go to Home" onPress={() => navigation.navigate('Home')}/>
-            <Button 
-            title="Go Back to first screen in stack" 
-            onPress={() => navigation.popToTop()}/>
-        </View>
-      )
-}
-
-function TransferScreen({ navigation }) {
-    return (
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-            <Text>Transfer Screen</Text>
-            <Button
-            title="Go to Support"
-            onPress={ () => navigation.navigate("Support")}
-            />
-            <Button
-                title="Go to Info"
-                onPress={ () => navigation.navigate("Info")}
-            />
-            <Button
-            title="Go to Current"
-            onPress={ () => navigation.navigate("Current")}
-                />
-            <Button title="Go to Home" onPress={() => navigation.navigate('Home')}/>
-            <Button 
-            title="Go Back to first screen in stack" 
-            onPress={() => navigation.popToTop()}/>
-        </View>
-      )
-}
-
 
 
 const Stack = createNativeStackNavigator();
@@ -132,17 +231,280 @@ function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="Current" component={CurrentScreen} />
-        <Stack.Screen name="Support" component={SupportScreen} />
-        <Stack.Screen name="Transfer" component={TransferScreen} />
-        <Stack.Screen name="Info" component={InfoScreen} />
+        <Stack.Screen name="Home" options={{ headerStyle: { backgroundColor: '#6A5ACD',}}} component={HomeScreen} />
+        <Stack.Screen name="About us" options={{ headerStyle: { backgroundColor: '#F08080',}}} component={AboutUsScreen} />
+        <Stack.Screen name="Contacts" options={{ headerStyle: { backgroundColor: '#6A5ACD',}}} component={ContactsScreen}/>
+        <Stack.Screen name="Support" options={{ headerStyle: { backgroundColor: '#4682B4',}}} component={SupportScreen}/>
+        <Stack.Screen name="Loading" options={{ headerStyle: { backgroundColor: '#ffff',}}} component={LoadingScreen}/>
+        <Stack.Screen name="Calculator" options={{ headerStyle: { backgroundColor: '#ffff',}}} component={CalcScreen}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
 
+const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      marginTop: 30,
+    },
+    titleText: {
+      fontSize: 20,
+      lineHeight: 24,
+      fontWeight: "bold",
+      marginBottom: 20
+    },
+    box: {
+      height: 150,
+      width: 150,
+      backgroundColor: "blue",
+      borderRadius: 5
+    },
+    centeredView: {
+      flex: 1,
+      flexDirection: "column",
+      gap: 20,
+      justifyContent: "center",
+      alignItems: "center",
+      marginTop: 25,
+      marginHorizontal: 100,
+      backgroundColor: "white",
+    },
+    modalView: {
+      margin: 20,
+      backgroundColor: "pink",
+      borderRadius: 20,
+      padding: 35,
+      alignItems: "center",
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 2
+      },
+      shadowOpacity: 1,
+      shadowRadius: 10
+    },
+    button: {
+      borderRadius: 50,
+      padding: 10
+    },
+    buttonOpen: {
+      backgroundColor: "green"
+    },
+    buttonClose: {
+      backgroundColor: "red"
+    },
+    textStyle: {
+      color: "white",
+      fontWeight: "bold",
+      textAlign: "center"
+    },
+    modalText: {
+      marginBottom: 15,
+      textAlign: "center"
+    },
+    text2: {
+      fontSize: 45
+    },
+    container2: {
+    flex: 1,
+    paddingTop: StatusBar.currentHeight,
+    },
+    scrollView: {
+      backgroundColor: 'pink',
+      marginHorizontal: 650,
+      width: 600,
+    },
+    text: {
+      fontSize: 38,
+      shadowOffset: {
+        width: 5,
+        height: 2
+      },
+      textAlign: 'center'
+    },
+    workers: {
+      borderWidth: 1,
+      marginTop: 100,
+      shadowColor: '#171717',
+      shadowOffset: {width: -2, height: 4},
+      shadowOpacity: 0.2,
+      shadowRadius: 3,
+    },
+    item: {
+      backgroundColor: "pink",
+      padding: 20,
+      marginVertical: 8
+    },
+    header: {
+      fontSize: 40,
+      backgroundColor: "grey"
+    },
+    title: {
+      fontSize: 25
+    }
+
+     
+  });
+  
+
 export default App;
+
+
+
+
+
+
+
+
+
+
+// import * as React from 'react';
+// import { View, Text, Button, StyleSheet } from 'react-native';
+// import { NavigationContainer } from '@react-navigation/native';
+// import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+// function HomeScreen({ navigation }) {
+//   return (
+//     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#ADD8E6' }}>
+//       <Text style={{fontWeight: 'bold', fontSize: 30, marginBottom: 10}}>Добро пожаловать в приложение "Мой Банк"!</Text>
+//       <Text style={{fontWeight: 'bold', fontSize: 20, marginBottom: 30}}>Вам пригодятся ссылки внизу:</Text>
+//       <Button
+//         onPress={() => navigation.navigate('Current')}
+//         title="Текущие счета">
+//       </Button>
+//       <Button
+//         onPress={() => navigation.navigate('Support')}
+//         title="Помощь">
+//       </Button>
+//       <Button
+//         onPress={() => navigation.navigate('Info')}
+//         title="Информация о кредите">
+//       </Button>
+//       <Button
+//         onPress={() => navigation.navigate('Transfer')}
+//         title="Переводы">
+//       </Button>
+//     </View>
+//   );
+// }
+
+// function CurrentScreen({ navigation }) {
+//   return (
+//     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+//       <Text>Current Screen</Text>
+//       <Button
+//         title="Go to Support"
+//         onPress={ () => navigation.navigate("Support")}
+//       />
+//       <Button
+//         title="Go to Info"
+//         onPress={ () => navigation.navigate("Info")}
+//       />
+//       <Button
+//       title="Go to Transfer"
+//       onPress={ () => navigation.navigate("Transfer")}
+//         />
+//       <Button title="Go to Home" onPress={() => navigation.navigate('Home')}/>
+//       <Button 
+//       title="Go Back to first screen in stack" 
+//       onPress={() => navigation.popToTop()}/>
+//     </View>
+//   )
+// }
+
+// function SupportScreen({ navigation }) {
+//     return (
+//       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+//         <Text>Support Screen</Text>
+//         <Button
+//         title="Go to Current"
+//         onPress={ () => navigation.navigate("Current")}
+//       />
+//       <Button
+//         title="Go to Info"
+//         onPress={ () => navigation.navigate("Info")}
+//       />
+//       <Button
+//       title="Go to Transfer"
+//       onPress={ () => navigation.navigate("Transfer")}
+//         />
+//       <Button title="Go to Home" onPress={() => navigation.navigate('Home')}/>
+//       <Button 
+//       title="Go Back to first screen in stack" 
+//       onPress={() => navigation.popToTop()}/>
+//       </View>
+//     )
+// }
+
+// function InfoScreen({ navigation }) {
+//     return (
+//         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+//           <Text>Info Screen</Text>
+//           <Button
+//             title="Go to Support"
+//             onPress={ () => navigation.navigate("Support")}
+//             />
+//             <Button
+//                 title="Go to Current"
+//                 onPress={ () => navigation.navigate("Current")}
+//             />
+//             <Button
+//             title="Go to Transfer"
+//             onPress={ () => navigation.navigate("Transfer")}
+//                 />
+//             <Button title="Go to Home" onPress={() => navigation.navigate('Home')}/>
+//             <Button 
+//             title="Go Back to first screen in stack" 
+//             onPress={() => navigation.popToTop()}/>
+//         </View>
+//       )
+// }
+
+// function TransferScreen({ navigation }) {
+//     return (
+//         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+//             <Text>Transfer Screen</Text>
+//             <Button
+//             title="Go to Support"
+//             onPress={ () => navigation.navigate("Support")}
+//             />
+//             <Button
+//                 title="Go to Info"
+//                 onPress={ () => navigation.navigate("Info")}
+//             />
+//             <Button
+//             title="Go to Current"
+//             onPress={ () => navigation.navigate("Current")}
+//                 />
+//             <Button title="Go to Home" onPress={() => navigation.navigate('Home')}/>
+//             <Button 
+//             title="Go Back to first screen in stack" 
+//             onPress={() => navigation.popToTop()}/>
+//         </View>
+//       )
+// }
+
+
+
+// const Stack = createNativeStackNavigator();
+
+// function App() {
+//   return (
+//     <NavigationContainer>
+//       <Stack.Navigator>
+//         <Stack.Screen name="Home" component={HomeScreen} />
+//         <Stack.Screen name="Current" component={CurrentScreen} />
+//         <Stack.Screen name="Support" component={SupportScreen} />
+//         <Stack.Screen name="Transfer" component={TransferScreen} />
+//         <Stack.Screen name="Info" component={InfoScreen} />
+//       </Stack.Navigator>
+//     </NavigationContainer>
+//   );
+// }
+
+// export default App;
 
 
 
@@ -179,147 +541,14 @@ export default App;
 // }
 
 
-const styles = StyleSheet.create({
-container: {
-flex: 1,
-backgroundColor: "#fff",
-alignItems: "center",
-justifyContent: "center",
-},
-});
-
-
-
-
-
-
-// import React, { useEffect, useState, useRef } from 'react';
-// import { View, Text, Button, StyleSheet, Animated, SafeAreaView, TouchableHighlight, TouchableOpacity, Switch, PanResponder } from 'react-native';
-// import { NavigationContainer } from '@react-navigation/native';
-// import { createNativeStackNavigator } from '@react-navigation/native-stack';
-// import Constants from 'expo-constants';
-// import { TextInput } from 'react-native-web';
-
-
-// function HomeScreen({ navigation, route }) {
-  
-//   return (
-//     <View style={{ alignItems: 'center' }}>
-//         <View style={{ flexDirection: 'row', minWidth: 1000, gap: 10, marginLeft: 20, marginTop: 10 }}>
-//             <Button title="Support" onPress={() => navigation.navigate('Support')}/>
-//             <Button title="Contacts" onPress={() => navigation.navigate('Contacts')}/>
-//             <Button title="About us" onPress={() => navigation.navigate('About us')}/>
-//             <Button title="Loading" onPress={() => navigation.navigate('Loading')}/>
-//         </View>
-//         <Text style={{fontSize: 50, fontFamily: 'American Typewriter, serif', marginTop: 20}}>Hi and Welcome to our New Website!</Text>
-//     </View>
-//   );
-// }
-
-// function LoadingScreen({ navigation, route }) {
-//     const pan = useRef(new Animated.ValueXY()).current;
-//   const panResponder = useRef(
-//     PanResponder.create({
-//       onMoveShouldSetPanResponder: () => true,
-//       onPanResponderMove: Animated.event([
-//         null,
-//         { dx: pan.x, dy: pan.y }
-//       ]),
-//       onPanResponderRelease: () => {
-//         Animated.spring(pan, { toValue: { x: 0, y: 0 } }).start();
-//       }
-//     })
-//   ).current;
-
-//   return (
-//     <View style={styles.container}>
-//       <Text style={styles.titleText}>Drag & Release this box!</Text>
-//       <Animated.View
-//         style={{
-//           transform: [{ translateX: pan.x }, { translateY: pan.y }]
-//         }}
-//         {...panResponder.panHandlers}
-//       >
-//         <View style={styles.box} />
-//       </Animated.View>
-//     </View>
-//   );
-// }
-
-// function SupportScreen({ navigation, route }) {
-
-//     let [val, setVal] = useState(0)
-
-//     return (
-//       <View
-//       style={{ alignItems: 'center', flex: 1, backgroundColor: '#AFEEEE' }}>
-//           <Text style={{ marginTop: 50, fontSize: 15}}>{val}</Text>
-//         <TouchableHighlight activeOpacity="0.5" onPress={()=>{setVal(val+1)}} style={{backgroundColor:"green", marginBottom: 10, borderRadius: 3, padding: 5}}>
-//           <Text style={{fontSize: 15}}>Plus</Text>
-//           </TouchableHighlight>
-//           <TouchableOpacity activeOpacity="0.5" onPress={()=>{setVal(val-1)}} style ={{backgroundColor: "red", borderRadius: 3, padding: 5}}>
-//           <Text style={{fontSize: 15}}>Minus</Text>
-//           </TouchableOpacity>
-//       </View>
-//     );
-// }   
-
-// function ContactsScreen({ navigation, route }) {
-
-//   return (
-//     <View style={{ flex: 1, alignItems: 'center', backgroundColor: '#FFC0CB' }}>
-//         <Text>Contacts</Text>
-//     </View>
-//   )
-// }
-
-// function AboutUsScreen({ navigation, route }) {
-//     return (
-//         <View style={{ flex: 1, alignItems: 'center', backgroundColor: '#FFEFD5'}}>
-//             <Text style={{ fontSize: 20, fontWeight: 'bold' }}>About Us</Text>
-//         </View>
-//     )
-// }
-
-
-// const Stack = createNativeStackNavigator();
-
-// function App() {
-//   return (
-//     <NavigationContainer>
-//       <Stack.Navigator>
-//         <Stack.Screen name="Home" component={HomeScreen} />
-//         <Stack.Screen name="About us" component={AboutUsScreen} />
-//         <Stack.Screen name="Contacts" component={ContactsScreen}/>
-//         <Stack.Screen name="Support" component={SupportScreen}/>
-//         <Stack.Screen name="Loading" component={LoadingScreen}/>
-//       </Stack.Navigator>
-//     </NavigationContainer>
-//   );
-// }
-
 // const styles = StyleSheet.create({
-//     container: {
-//       flex: 1,
-//       alignItems: "center",
-//       justifyContent: "center"
-//     },
-//     titleText: {
-//       fontSize: 14,
-//       lineHeight: 24,
-//       fontWeight: "bold"
-//     },
-//     box: {
-//       height: 150,
-//       width: 150,
-//       backgroundColor: "blue",
-//       borderRadius: 5
-//     }
-//   });
-  
-
-// export default App;
-
+// container: {
+// flex: 1,
+// backgroundColor: "#fff",
+// alignItems: "center",
+// justifyContent: "center",
+// },
+// });
 
 
 
